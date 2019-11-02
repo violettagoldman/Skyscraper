@@ -125,26 +125,35 @@ def generation():
         exit()
     n = int(sys.argv[1])
     print("Generation of grids of {} dimensions".format(n))
-    print_grid(create_grid(n), generate_random_boards(n))
+    i = 0
+    while True:
+        print("try nb {}...".format(i))
+        i += 1
+        boards = generate_random_boards(n)
+        if (solve(boards)):
+            print("Solved!")
+            exit()
+        else:
+            print("Not solvable")
 
-g = np.array([[3, 4, 1, 2], [1, 3, 2, 4], [2, 1, 4, 3], [4, 2, 3, 1]])
-b = (np.array([2, 1, 3, 2]),
-np.array([2, 1, 2, 3]),
-np.array([1, 3, 2, 3]),
-np.array([2, 3, 2, 1]))
+#g = np.array([[3, 4, 1, 2], [1, 3, 2, 4], [2, 1, 4, 3], [4, 2, 3, 1]])
+#b = (np.array([2, 1, 3, 2]),
+#np.array([2, 1, 2, 3]),
+#np.array([1, 3, 2, 3]),
+#np.array([2, 3, 2, 1]))
 
-#generation()
+generation()
 #print_grid(g, b)
 #print(check(g, b))
 #solve(b)
-ge = create_grid(3)
-be = generate_random_boards(3)
-print_grid(ge, be)
-print()
-ge = fill_evident(ge, be)
-print_grid(ge, be)
+#ge = create_grid(3)
+#be = generate_random_boards(3)
+#print_grid(ge, be)
+#print()
+#ge = fill_evident(ge, be)
+#print_grid(ge, be)
 
-print()
-print(solve(b))
+#print()
+#print(solve(b))
 
 #print(fill_row([2, 0, 3, 4]))
