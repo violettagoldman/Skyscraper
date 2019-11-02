@@ -45,10 +45,14 @@ def check(grid, boards):
 def check_vect(target, row):
     max = 0
     count = 0
+    s = set()
     for i in row:
         if (i > max):
             max = i
             count += 1
+        s.add(i)
+    if (len(s) != len(row)):
+        return False
     return target == count
 
 def grid_full(grid):
@@ -58,8 +62,23 @@ def grid_full(grid):
                 return False
     return True
 
+def fill_row(row):
+    count_undefined = 0
+    index = 0
+    for i in range(len(row)):
+        if (row[i] == 0):
+            count_undefined += 1
+            index = i
+    if (count_undefined == 1):
+        for i in range(1, len(row) + 1):
+            if (not i in row):
+                row[index] = i
+    return row
+
 def fill_evident(grid, boards):
     for i in range(grid.shape[0]):
+        grid[:, i] = fill_row(grid[:, i])
+        grid[i, :] = fill_row(grid[i, :])
         if (boards[0][i] == grid.shape[0]):
             grid[:, i] = np.array(range(1, grid.shape[0] + 1))
         if (boards[2][i] == grid.shape[0]):
@@ -73,9 +92,14 @@ def fill_evident(grid, boards):
 def solve_rec(grid, boards):
     if (grid_full(grid)):
         if (check(grid, boards)):
+            print_grid(grid, boards)
             return True
         return False
     grid = fill_evident(grid, boards)
+    for rec in fill_random(grid):
+        if (solve_rec(rec, boards)):
+            return True
+    return False
 
 def fill_random(grid):
     cords = None
@@ -86,11 +110,14 @@ def fill_random(grid):
                 cords = (i, j)
     if (cords != None):
         for i in range(1, grid.shape[0] + 1):
-            grid = array()
-    return ()
+            temp = np.array(grid)
+            temp[cords] = i
+            res.append(temp)
+    return res
 
 def solve(boards):
-    pass
+    grid = create_grid(boards[0].shape[0])
+    return solve_rec(grid, boards)
 
 def generation():
     if (len(sys.argv) != 2):
@@ -113,5 +140,11 @@ np.array([2, 3, 2, 1]))
 ge = create_grid(3)
 be = generate_random_boards(3)
 print_grid(ge, be)
+print()
 ge = fill_evident(ge, be)
 print_grid(ge, be)
+
+print()
+print(solve(b))
+
+#print(fill_row([2, 0, 3, 4]))
