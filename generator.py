@@ -127,6 +127,7 @@ def solve_rec(grid, boards):
     if (grid_full(grid)):
         if (check(grid, boards)):
             print_grid(grid, boards)
+            grids = load_arr(grid.shape[0])
             if (not boards in grids):
                 print("A new grid added :)")
                 grids.append(boards)
@@ -179,7 +180,6 @@ def load_arr(n):
         return []
     with open("./grids/grids_{}.json".format(n), "r") as file:
         content = file.read()
-        print(content)
     return json.loads(content)
 
 def save_arr(n, array):
