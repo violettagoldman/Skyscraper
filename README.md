@@ -4,8 +4,9 @@
 - [ ] Generate random boards
     - [x] Create random boards
     - [x] Check if a grid is valid
-    - [ ] Solve a grid with boards
-    - [ ] If valid, store it in JSON
+    - [x] Solve a grid with boards
+    - [x] If valid, store it in JSON
+    - [ ] Optimisation to generate larger grids
 
 - [ ] Create interface
     - [ ] Interact with a grid
