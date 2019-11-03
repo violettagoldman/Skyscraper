@@ -1,12 +1,26 @@
+import json
 import sys
 import numpy as np
 from itertools import product
+from os import path
 
 def random_board(n):
-    return np.floor(np.random.rand(n) * n + 1).astype(int)
+    return np.floor(np.random.rand(n) * n + 1).astype(int).tolist()
 
 def generate_random_boards(n):
-    return (random_board(n), random_board(n), random_board(n), random_board(n))
+    top = random_board(n)
+    right = random_board(n)
+    bottom = random_board(n)
+    left = random_board(n)
+    valid = True
+    for i in range(n):
+        if (top[i] == bottom[i] and (top[i] == 1 or top[i] == n)):
+            valid = False
+        if (left[i] == right[i] and (left[i] == 1 or left[i] == n)):
+            valid = False
+    if (not valid):
+        return generate_random_boards(n)
+    return [top, right, bottom, left]
 
 def create_grid(n):
     return np.zeros([n, n]).astype(int)
@@ -39,6 +53,25 @@ def check(grid, boards):
         if (not check_vect(boards[1][i], np.flip(grid[i, :]))):
             return False
         if (not check_vect(boards[3][i], grid[i, :])):
+            return False
+    return True
+
+def check_grid_not_full(grid):
+    for i in range(grid.shape[0]):
+        if (not check_vect_not_full(grid[:, i])):
+            return False
+        if (not check_vect_not_full(grid[i, :])):
+            return False
+    return True
+
+
+def check_vect_not_full(vect):
+    for i in range(1, len(vect) + 1):
+        count = 0
+        for j in vect:
+            if (j == i):
+                count += 1
+        if (count > 1):
             return False
     return True
 
@@ -90,14 +123,22 @@ def fill_evident(grid, boards):
     return grid
 
 def solve_rec(grid, boards):
+    global grids
     if (grid_full(grid)):
         if (check(grid, boards)):
             print_grid(grid, boards)
+            if (not boards in grids):
+                print("A new grid added :)")
+                grids.append(boards)
+                save_arr(grid.shape[0], grids)
+            else:
+                print("Already exists :(")
+            print("Length:{}".format(len(grids)))
             return True
         return False
     grid = fill_evident(grid, boards)
     for rec in fill_random(grid):
-        if (solve_rec(rec, boards)):
+        if (check_grid_not_full(rec) and solve_rec(rec, boards)):
             return True
     return False
 
@@ -116,44 +157,33 @@ def fill_random(grid):
     return res
 
 def solve(boards):
-    grid = create_grid(boards[0].shape[0])
+    grid = create_grid(len(boards[0]))
     return solve_rec(grid, boards)
 
 def generation():
+    global grids
     if (len(sys.argv) != 2):
         print("Error: Number of arguments is not valid")
         exit()
     n = int(sys.argv[1])
     print("Generation of grids of {} dimensions".format(n))
     i = 0
+    grids = load_arr(n)
     while True:
-        print("try nb {}...".format(i))
         i += 1
         boards = generate_random_boards(n)
-        if (solve(boards)):
-            print("Solved!")
-            exit()
-        else:
-            print("Not solvable")
+        solve(boards)
 
-#g = np.array([[3, 4, 1, 2], [1, 3, 2, 4], [2, 1, 4, 3], [4, 2, 3, 1]])
-#b = (np.array([2, 1, 3, 2]),
-#np.array([2, 1, 2, 3]),
-#np.array([1, 3, 2, 3]),
-#np.array([2, 3, 2, 1]))
+def load_arr(n):
+    if (not path.exists("./grids/grids_{}.json".format(n))):
+        return []
+    with open("./grids/grids_{}.json".format(n), "r") as file:
+        content = file.read()
+        print(content)
+    return json.loads(content)
+
+def save_arr(n, array):
+    with open("./grids/grids_{}.json".format(n), "w+") as file:
+        file.write(json.dumps(array))
 
 generation()
-#print_grid(g, b)
-#print(check(g, b))
-#solve(b)
-#ge = create_grid(3)
-#be = generate_random_boards(3)
-#print_grid(ge, be)
-#print()
-#ge = fill_evident(ge, be)
-#print_grid(ge, be)
-
-#print()
-#print(solve(b))
-
-#print(fill_row([2, 0, 3, 4]))
